@@ -12,14 +12,16 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Habilita o mod_rewrite do Apache
-RUN a2enmod rewrite
+# Habilita o mod_rewrite e troca mpm_prefork pelo mpm_event (mais eficiente)
+RUN a2enmod rewrite \
+    && a2dismod mpm_prefork \
+    && a2enmod mpm_event
 
 # Corrige aviso de ServerName
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Copia configuração customizada do MPM Prefork (aumenta MaxRequestWorkers)
-COPY docker/apache/mpm_prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
+# Configuração do MPM Event com limites adequados para o free tier
+RUN printf '<IfModule mpm_event_module>\n  StartServers 2\n  MinSpareThreads 25\n  MaxSpareThreads 75\n  ThreadLimit 64\n  ThreadsPerChild 25\n  MaxRequestWorkers 150\n  MaxConnectionsPerChild 1000\n</IfModule>\n' > /etc/apache2/conf-enabled/mpm_event.conf
 
 # Aponta o DocumentRoot do Apache para a pasta /public do Laravel
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
