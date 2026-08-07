@@ -20,6 +20,10 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/conf-available/*.conf
 
+# Configura o Apache para escutar na porta 80 por padrão
+ENV PORT 80
+EXPOSE 80
+
 WORKDIR /var/www/html
 
 # Copia o código do projeto
@@ -32,8 +36,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Permissões de escrita
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-EXPOSE 80
 
 # Executa as migrations e seeders no banco online e inicia o servidor Apache
 CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
