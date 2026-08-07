@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Pagamento;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Força HTTPS em produção (necessário atrás do proxy do Render)
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+
         View::composer('*', function ($view) {
             if (auth()->check()) {
                 $totalReceita = Pagamento::where('status', 'pago')->sum('valor');
