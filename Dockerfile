@@ -18,9 +18,9 @@ RUN a2enmod rewrite
 # Corrige aviso de ServerName
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Configura o MPM Prefork com limites baixos para o free tier (512MB RAM)
-# Valor padrão era 256 workers - muito alto para o free tier
-RUN printf '<IfModule mpm_prefork_module>\n  StartServers 2\n  MinSpareServers 2\n  MaxSpareServers 5\n  MaxRequestWorkers 20\n  MaxConnectionsPerChild 500\n</IfModule>\n' > /etc/apache2/conf-enabled/mpm_prefork_custom.conf
+# Sobrescreve o mpm_prefork.conf diretamente no local canônico lido pelo Apache
+# O padrão é 256 workers - muito alto para o free tier com 512MB RAM
+RUN printf '<IfModule mpm_prefork_module>\n  StartServers 2\n  MinSpareServers 2\n  MaxSpareServers 5\n  MaxRequestWorkers 25\n  MaxConnectionsPerChild 500\n</IfModule>\n' > /etc/apache2/mods-available/mpm_prefork.conf
 
 # Aponta o DocumentRoot do Apache para a pasta /public do Laravel
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
