@@ -15,6 +15,12 @@ RUN apt-get update && apt-get install -y \
 # Habilita o mod_rewrite do Apache
 RUN a2enmod rewrite
 
+# Corrige aviso de ServerName
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Copia configuração customizada do MPM Prefork (aumenta MaxRequestWorkers)
+COPY docker/apache/mpm_prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
+
 # Aponta o DocumentRoot do Apache para a pasta /public do Laravel
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
