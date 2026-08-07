@@ -19,8 +19,11 @@ RUN a2enmod rewrite
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
 # Sobrescreve o mpm_prefork.conf diretamente no local canônico lido pelo Apache
-# O padrão é 256 workers - muito alto para o free tier com 512MB RAM
-RUN printf '<IfModule mpm_prefork_module>\n  StartServers 2\n  MinSpareServers 2\n  MaxSpareServers 5\n  MaxRequestWorkers 25\n  MaxConnectionsPerChild 500\n</IfModule>\n' > /etc/apache2/mods-available/mpm_prefork.conf
+RUN printf '<IfModule mpm_prefork_module>\n  StartServers 3\n  MinSpareServers 3\n  MaxSpareServers 10\n  MaxRequestWorkers 50\n  MaxConnectionsPerChild 1000\n</IfModule>\n' > /etc/apache2/mods-available/mpm_prefork.conf
+
+# Desliga KeepAlive e define Timeout curto para liberar workers travados rapidamente
+RUN printf 'KeepAlive Off\nTimeout 30\n' > /etc/apache2/conf-enabled/timeouts.conf
+
 
 # Aponta o DocumentRoot do Apache para a pasta /public do Laravel
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
