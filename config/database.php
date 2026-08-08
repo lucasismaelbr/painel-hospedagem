@@ -60,9 +60,8 @@ return [
             // Reconecta automaticamente quando o Aiven derruba a conexão por inatividade
             'reconnect'      => true,
             'options'        => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA              => env('MYSQL_ATTR_SSL_CA'),
-                PDO::ATTR_TIMEOUT                   => 10, // timeout de conexão em segundos
-                PDO::MYSQL_ATTR_CONNECT_TIMEOUT     => 10,
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::ATTR_TIMEOUT      => 10,
             ]) : [],
         ],
 
