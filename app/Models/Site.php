@@ -38,6 +38,12 @@ class Site extends Model
         return $this->hasOne(SiteConnection::class);
     }
 
+    public function backups(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SiteBackup::class)->orderBy('created_at', 'desc');
+    }
+
+
 
     // Sites com renovação nos próximos X dias
     public function scopeRenovacaoProxima($query, int $dias = 30)

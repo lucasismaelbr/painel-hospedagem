@@ -112,10 +112,15 @@
             <span class="status-pill status-desconectado">● Sem Conexão</span>
         @endif
 
+        <a href="{{ route('sites.backups', $site) }}" class="btn btn-outline btn-sm">
+            💾 Backups
+        </a>
+
         <button type="button" class="btn btn-outline btn-sm" onclick="openModal('modal-config-connection')">
             ⚙️ Configurar Conexão
         </button>
     </div>
+
 </div>
 
 @if($error)

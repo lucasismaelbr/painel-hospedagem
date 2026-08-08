@@ -96,5 +96,13 @@ Route::middleware('auth')->group(function () {
     Route::post('sites/{site}/files/rename', [\App\Http\Controllers\SiteFileManagerController::class, 'renameItem'])->name('sites.files.rename');
     Route::post('sites/{site}/files/upload', [\App\Http\Controllers\SiteFileManagerController::class, 'uploadFile'])->name('sites.files.upload');
     Route::get('sites/{site}/files/download', [\App\Http\Controllers\SiteFileManagerController::class, 'downloadFile'])->name('sites.files.download');
+
+    // ── Gestão de Backups do Site ─────────────────────────────
+    Route::get('sites/{site}/backups', [\App\Http\Controllers\SiteBackupController::class, 'index'])->name('sites.backups');
+    Route::post('sites/{site}/backups/create', [\App\Http\Controllers\SiteBackupController::class, 'store'])->name('sites.backups.create');
+    Route::post('sites/{site}/backups/{backup}/restore', [\App\Http\Controllers\SiteBackupController::class, 'restore'])->name('sites.backups.restore');
+    Route::get('sites/{site}/backups/{backup}/download', [\App\Http\Controllers\SiteBackupController::class, 'download'])->name('sites.backups.download');
+    Route::delete('sites/{site}/backups/{backup}', [\App\Http\Controllers\SiteBackupController::class, 'destroy'])->name('sites.backups.destroy');
 });
+
 

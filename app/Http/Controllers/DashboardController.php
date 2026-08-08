@@ -60,12 +60,20 @@ class DashboardController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
+        // Métricas da Central de Hospedagem
+        $sitesConectados = \App\Models\SiteConnection::where('status', 'conectado')->count();
+        $sitesProblema = \App\Models\SiteConnection::where('status', 'erro')->count();
+        $totalBackups = \App\Models\SiteBackup::where('status', 'completed')->count();
+
         return view('dashboard', [
             'mrr' => $mrr,
             'faturamentoMes' => $faturamentoMes,
             'faturamentoAno' => $faturamentoAno,
             'totalClientes' => Cliente::ativos()->count(),
             'totalSites' => Site::where('status', 'ativo')->count(),
+            'sitesConectados' => $sitesConectados,
+            'sitesProblema' => $sitesProblema,
+            'totalBackups' => $totalBackups,
             'pagamentosPendentes' => Pagamento::whereIn('status', ['pendente', 'atrasado'])
                 ->with('cliente')
                 ->orderBy('data_vencimento')
@@ -78,4 +86,5 @@ class DashboardController extends Controller
             'tarefasHoje' => $tarefasHoje,
         ]);
     }
+
 }

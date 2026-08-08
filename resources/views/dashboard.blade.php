@@ -41,7 +41,29 @@
         <div class="stat-value">{{ $totalSites }}</div>
         <div class="stat-icon">🌐</div>
     </div>
+
+    <!-- Card 6: Sites Conectados -->
+    <div class="stat-card" style="--accent-color: #4ade80;">
+        <div class="stat-label">Sites Conectados</div>
+        <div class="stat-value">{{ $sitesConectados ?? 0 }}</div>
+        <div class="stat-icon">⚡</div>
+    </div>
+
+    <!-- Card 7: Sites Com Problema -->
+    <div class="stat-card" style="--accent-color: #f87171;">
+        <div class="stat-label">Com Problema</div>
+        <div class="stat-value">{{ $sitesProblema ?? 0 }}</div>
+        <div class="stat-icon">⚠️</div>
+    </div>
+
+    <!-- Card 8: Backups Realizados -->
+    <div class="stat-card" style="--accent-color: #38bdf8;">
+        <div class="stat-label">Backups Salvos</div>
+        <div class="stat-value">{{ $totalBackups ?? 0 }}</div>
+        <div class="stat-icon">💾</div>
+    </div>
 </div>
+
 
 <!-- 🎯 Objetivos do Dia & To-Do List -->
 <div class="card" style="margin-bottom: 28px;">
