@@ -21,15 +21,20 @@ class Log extends Model
      * Helper estático para registrar logs de qualquer lugar:
      * Log::registrar('criou', 'clientes', $cliente->id);
      */
-    public static function registrar(string $acao, ?string $tabela = null, ?int $registroId = null): void
+    public static function registrar(string $acao, ?string $tabela = null, $registroId = null): void
     {
-        self::create([
-            'usuario_id' => auth()->id(),
-            'acao' => $acao,
-            'tabela_afetada' => $tabela,
-            'registro_id' => $registroId,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-        ]);
+        try {
+            self::create([
+                'usuario_id'     => auth()->id(),
+                'acao'           => substr($acao, 0, 50),
+                'tabela_afetada' => $tabela ? substr($tabela, 0, 50) : null,
+                'registro_id'    => is_numeric($registroId) ? (int)$registroId : null,
+                'ip_address'     => request()->ip(),
+                'user_agent'     => request()->userAgent(),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Log::registrar erro: ' . $e->getMessage());
+        }
     }
+
 }

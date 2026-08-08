@@ -29,48 +29,56 @@ class UserController extends Controller
 
     public function updatePerfil(Request $request)
     {
-        $user = auth()->user();
+        try {
+            $user = auth()->user();
 
-        $request->validate([
-            'nome' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:150', Rule::unique('users')->ignore($user->id)],
-            'senha_atual' => ['nullable', 'required_with:nova_senha'],
-            'nova_senha' => ['nullable', 'min:6', 'confirmed'],
-            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:3072'],
-        ]);
+            $request->validate([
+                'nome' => ['required', 'string', 'max:100'],
+                'email' => ['required', 'email', 'max:150', Rule::unique('users')->ignore($user->id)],
+                'senha_atual' => ['nullable', 'required_with:nova_senha'],
+                'nova_senha' => ['nullable', 'min:6', 'confirmed'],
+                'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+            ]);
 
-        if ($request->hasFile('foto_perfil')) {
-            $file = $request->file('foto_perfil');
-            $filename = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            
-            $destinationPath = public_path('uploads/avatars');
-            if (!File::exists($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true);
+            if ($request->hasFile('foto_perfil') && $request->file('foto_perfil')->isValid()) {
+                $file = $request->file('foto_perfil');
+                $ext = $file->getClientOriginalExtension() ?: 'jpg';
+                $filename = 'user_' . $user->id . '_' . time() . '.' . $ext;
+                
+                $destinationPath = public_path('uploads/avatars');
+                if (!File::isDirectory($destinationPath)) {
+                    File::makeDirectory($destinationPath, 0777, true, true);
+                }
+
+                // Exclui a foto antiga se existir
+                if ($user->foto_perfil && File::exists($destinationPath . '/' . $user->foto_perfil)) {
+                    @File::delete($destinationPath . '/' . $user->foto_perfil);
+                }
+
+                $file->move($destinationPath, $filename);
+                $user->foto_perfil = $filename;
             }
 
-            // Exclui a foto antiga se existir
-            if ($user->foto_perfil && File::exists($destinationPath . '/' . $user->foto_perfil)) {
-                File::delete($destinationPath . '/' . $user->foto_perfil);
+            if ($request->filled('nova_senha')) {
+                if (!Hash::check($request->senha_atual, $user->password)) {
+                    return back()->withErrors(['senha_atual' => 'A senha atual está incorreta.']);
+                }
+                $user->password = $request->nova_senha;
             }
 
-            $file->move($destinationPath, $filename);
-            $user->foto_perfil = $filename;
+            $user->nome = $request->nome;
+            $user->email = $request->email;
+            $user->save();
+
+            Log::registrar('perfil_atualizado', 'users', $user->id);
+
+            return back()->with('sucesso', 'Seu perfil foi atualizado com sucesso!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Erro ao atualizar perfil: ' . $e->getMessage());
+            return back()->with('erro', 'Erro ao salvar perfil: ' . $e->getMessage());
         }
-
-        if ($request->filled('nova_senha')) {
-            if (!Hash::check($request->senha_atual, $user->password)) {
-                return back()->withErrors(['senha_atual' => 'A senha atual está incorreta.']);
-            }
-            $user->password = $request->nova_senha;
-        }
-
-        $user->nome = $request->nome;
-        $user->email = $request->email;
-        $user->save();
-
-        Log::registrar('perfil_atualizado', "Perfil de {$user->nome} atualizado.");
-
-        return back()->with('sucesso', 'Seu perfil foi atualizado com sucesso!');
     }
 
     public function store(Request $request)
@@ -86,14 +94,14 @@ class UserController extends Controller
             'nivel' => ['required', Rule::in(['admin', 'colaborador'])],
         ]);
 
-        User::create([
+        $novo = User::create([
             'nome' => $request->nome,
             'email' => $request->email,
             'password' => $request->password,
             'nivel' => $request->nivel,
         ]);
 
-        Log::registrar('usuario_criado', "Usuário {$request->nome} cadastrado como {$request->nivel}.");
+        Log::registrar('usuario_criado', 'users', $novo->id);
 
         return back()->with('sucesso', "Usuário {$request->nome} cadastrado com sucesso!");
     }
@@ -128,7 +136,7 @@ class UserController extends Controller
 
         $usuario->save();
 
-        Log::registrar('usuario_atualizado', "Usuário {$usuario->nome} atualizado.");
+        Log::registrar('usuario_atualizado', 'users', $usuario->id);
 
         return back()->with('sucesso', "Usuário {$usuario->nome} atualizado com sucesso!");
     }
@@ -151,10 +159,12 @@ class UserController extends Controller
         }
 
         $nome = $usuario->nome;
+        $id = $usuario->id;
         $usuario->delete();
 
-        Log::registrar('usuario_deletado', "Usuário {$nome} excluído por " . auth()->user()->nome);
+        Log::registrar('usuario_deletado', 'users', $id);
 
         return back()->with('sucesso', "Usuário {$nome} excluído com sucesso!");
     }
+
 }
