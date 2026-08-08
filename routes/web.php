@@ -10,6 +10,42 @@ use App\Http\Controllers\TarefaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+// ── Diagnóstico (remover após debug) ──────────────────────
+Route::get('/diag/db', function () {
+    try {
+        $start = microtime(true);
+        $count = \App\Models\User::count();
+        $elapsed = round((microtime(true) - $start) * 1000);
+        return response()->json(['status' => 'DB OK', 'users' => $count, 'ms' => $elapsed]);
+    } catch (\Throwable $e) {
+        return response()->json(['status' => 'DB ERRO', 'message' => $e->getMessage()], 500);
+    }
+});
+
+Route::get('/diag/session', function () {
+    try {
+        session(['test' => 'ok_' . time()]);
+        $val = session('test');
+        return response()->json(['status' => 'SESSION OK', 'value' => $val]);
+    } catch (\Throwable $e) {
+        return response()->json(['status' => 'SESSION ERRO', 'message' => $e->getMessage()], 500);
+    }
+});
+
+Route::post('/diag/login-test', function (\Illuminate\Http\Request $req) {
+    $start = microtime(true);
+    try {
+        $ok = \Illuminate\Support\Facades\Auth::attempt([
+            'email'    => $req->input('email', 'lucasmartins.ecom@gmail.com'),
+            'password' => $req->input('password', 'senha123'),
+        ]);
+        $elapsed = round((microtime(true) - $start) * 1000);
+        return response()->json(['status' => $ok ? 'AUTH OK' : 'AUTH FALHOU', 'ms' => $elapsed]);
+    } catch (\Throwable $e) {
+        return response()->json(['status' => 'AUTH ERRO', 'message' => $e->getMessage()], 500);
+    }
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
 // ── Autenticação ──────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
