@@ -43,9 +43,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Permissões de escrita e de execução do script
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN mkdir -p /var/www/html/public/uploads/avatars
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/uploads
+RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/uploads
 RUN chmod +x /var/www/html/entrypoint.sh
+
 
 # Executa o entrypoint.sh que abre a porta 80 na hora
 CMD ["/var/www/html/entrypoint.sh"]

@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+mkdir -p /var/www/html/public/uploads/avatars
+chown -R www-data:www-data /var/www/html/public/uploads
+chmod -R 777 /var/www/html/public/uploads
+
 # Só roda migrations se o banco estiver configurado
 # Evita que processos PHP travem esperando conexão inexistente
 (sleep 3 && \
