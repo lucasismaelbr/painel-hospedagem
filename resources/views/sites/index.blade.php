@@ -32,12 +32,14 @@
                     </td>
                     <td>{{ $site->data_renovacao?->format('d/m/Y') ?? '—' }}</td>
                     <td>
-                        <a href="{{ route('sites.edit', $site) }}" class="btn btn-secondary btn-sm">✏️</a>
+                        <a href="{{ route('sites.manager', $site) }}" class="btn btn-primary btn-sm" title="Gerenciador de Arquivos & Conexão">⚡ Gerenciar</a>
+                        <a href="{{ route('sites.edit', $site) }}" class="btn btn-secondary btn-sm" title="Editar Site">✏️</a>
                         <form method="POST" action="{{ route('sites.destroy', $site) }}" style="display:inline;" onsubmit="return confirm('Excluir site?')">
                             @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                            <button type="submit" class="btn btn-danger btn-sm" title="Excluir Site">🗑️</button>
                         </form>
                     </td>
+
                 </tr>
                 @empty
                 <tr><td colspan="6"><div class="empty-state"><div class="icon">🌐</div><p>Nenhum site</p></div></td></tr>

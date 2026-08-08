@@ -82,4 +82,19 @@ Route::middleware('auth')->group(function () {
     Route::post('usuarios', [UserController::class, 'store'])->name('usuarios.store');
     Route::put('usuarios/{usuario}', [UserController::class, 'update'])->name('usuarios.update');
     Route::delete('usuarios/{usuario}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+
+    // ── Gerenciador de Arquivos & Conexão de Sites ────────────
+    Route::get('sites/{site}/manager', [\App\Http\Controllers\SiteFileManagerController::class, 'index'])->name('sites.manager');
+    Route::post('sites/{site}/connection', [\App\Http\Controllers\SiteConnectionController::class, 'storeOrUpdate'])->name('sites.connection.save');
+    Route::post('sites/{site}/connection/test', [\App\Http\Controllers\SiteConnectionController::class, 'test'])->name('sites.connection.test');
+
+    Route::get('sites/{site}/files/read', [\App\Http\Controllers\SiteFileManagerController::class, 'readFile'])->name('sites.files.read');
+    Route::post('sites/{site}/files/write', [\App\Http\Controllers\SiteFileManagerController::class, 'writeFile'])->name('sites.files.write');
+    Route::post('sites/{site}/files/create', [\App\Http\Controllers\SiteFileManagerController::class, 'createFile'])->name('sites.files.create');
+    Route::post('sites/{site}/folders/create', [\App\Http\Controllers\SiteFileManagerController::class, 'createFolder'])->name('sites.folders.create');
+    Route::post('sites/{site}/files/delete', [\App\Http\Controllers\SiteFileManagerController::class, 'deleteItem'])->name('sites.files.delete');
+    Route::post('sites/{site}/files/rename', [\App\Http\Controllers\SiteFileManagerController::class, 'renameItem'])->name('sites.files.rename');
+    Route::post('sites/{site}/files/upload', [\App\Http\Controllers\SiteFileManagerController::class, 'uploadFile'])->name('sites.files.upload');
+    Route::get('sites/{site}/files/download', [\App\Http\Controllers\SiteFileManagerController::class, 'downloadFile'])->name('sites.files.download');
 });
+

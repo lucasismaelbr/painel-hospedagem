@@ -2,10 +2,12 @@
 @section('title', $site->dominio) @section('page-title', $site->nome_site) @section('page-subtitle', $site->dominio)
 @section('topbar-actions')
 <div style="display:flex;gap:10px;">
+    <a href="{{ route('sites.manager', $site) }}" class="btn btn-primary">⚡ Abrir Gerenciador de Arquivos</a>
     <a href="{{ route('sites.edit', $site) }}" class="btn btn-secondary">✏️ Editar</a>
     <a href="{{ route('sites.index') }}" class="btn btn-secondary">← Voltar</a>
 </div>
 @endsection
+
 @section('content')
 <div class="grid-2" style="gap:24px;margin-bottom:24px;">
     <div class="card">

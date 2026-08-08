@@ -33,6 +33,12 @@ class Site extends Model
         return $this->hasMany(Pagamento::class);
     }
 
+    public function connection(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(SiteConnection::class);
+    }
+
+
     // Sites com renovação nos próximos X dias
     public function scopeRenovacaoProxima($query, int $dias = 30)
     {
