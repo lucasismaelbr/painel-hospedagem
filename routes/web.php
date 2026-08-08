@@ -25,13 +25,13 @@ Route::get('/diag/db', function () {
 Route::get('/diag/session', function () {
     try {
         session(['test' => 'ok_' . time()]);
-        $val = session('test');
-        return response()->json(['status' => 'SESSION OK', 'value' => $val]);
+        return response()->json(['status' => 'SESSION OK', 'value' => session('test')]);
     } catch (\Throwable $e) {
         return response()->json(['status' => 'SESSION ERRO', 'message' => $e->getMessage()], 500);
     }
 });
 
+// POST sem CSRF — usa withoutMiddleware com a classe do Laravel 11
 Route::post('/diag/login-test', function (\Illuminate\Http\Request $req) {
     $start = microtime(true);
     try {
@@ -44,7 +44,7 @@ Route::post('/diag/login-test', function (\Illuminate\Http\Request $req) {
     } catch (\Throwable $e) {
         return response()->json(['status' => 'AUTH ERRO', 'message' => $e->getMessage()], 500);
     }
-})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+})->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
 
 // ── Autenticação ──────────────────────────────────────────
 Route::middleware('guest')->group(function () {
